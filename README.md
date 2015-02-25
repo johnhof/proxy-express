@@ -6,11 +6,13 @@ A configurable proxy as express middleware
 ```javscript
 
 
+server.use(proxy.rule('example.host.com') // straight proxy
+// or
 server.use(proxy.rule('example.host.com', 'prefix/*') // (use grunt matching template)
 // or
-server.use(proxy.rule('example.host.com', //);
+server.use(proxy.rule('example.host.com', /.+?_example.+?/);
 // or
-server.use(proxy.rule('example.host.com', { // no options straight proxies all routes to host
+server.use(proxy.rule('example.host.com', {
 
   //
   // conditions (no condition matches any route)
