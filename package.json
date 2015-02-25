@@ -1,26 +1,20 @@
 {
-  "name": "mongoman",
+  "name": "express-proxy",
   "author": "John Hofrichter <https://github.com/johnhof>",
-  "description": "MongoDB management utility",
-  "version": "1.0.0",
-  "repository": "git://github.com/johnhof/mongoman",
-  "main": "lib/mongoman.js",
+  "description": "Request proxying middleware for express",
+  "version": "0.0.0",
+  "repository": "git://github.com/johnhof/express-proxy",
+  "main": "lib/proxy.js",
   "keywords": [
-    "schema",
-    "validation",
-    "mongo",
-    "mongodb",
-    "mongoose",
-    "mongoman",
-    "mongomanjs"
+    "proxy",
+    "express"
   ],
   "engines": {
     "node": ">=0.8.0"
   },
   "dependencies": {
-    "fs": "0.0.2",
     "lodash": "2.4.x",
-    "mongoose": "3.8.x"
+    "request": "2.53.x"
   },
   "scripts": {
     "test": "mocha"
@@ -28,12 +22,11 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/johnhof/mongoman/blob/master/LICENSE-MIT"
+      "url": "https://github.com/johnhof/express-proxy/blob/master/LICENSE-MIT"
     }
   ],
   "devDependencies": {
     "should": "1.1.x",
-    "bcrypt-nodejs": "0.0.x",
     "chai": "1.10.x",
     "mocha": "1.21.x",
     "async": "0.2.5"
