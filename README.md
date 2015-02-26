@@ -3,6 +3,8 @@ Express Proxy
 
 A configurable proxy as express middleware
 
+### this module is still in pre-production. use is not recommended
+
 First draft
 
 ```javscript
