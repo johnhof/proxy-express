@@ -1,26 +1,39 @@
 var proxy  = require('../lib/proxy');
 var server = require('express')();
 
-server.use(proxy('api.github.com'));
+var gitProxy = null;
 
-// // or
+// NOTE: github requires a header and https. we'll have to find another API to test the pure proxy approach
 
-// server.use(proxy('api.github.com', '/githb'));
+// pure proxy
+// gitProxy = proxy('api.github.com', '/github');
 
-// // or
+// or
 
-// server.use(proxy('api.github.com', /^\/github/));
+// regex match pure proxy
+// gitProxy = proxy('api.github.com', /^\/github/); // NOT IMPLEMENTED
 
-// // or
+// or
 
-// server.use(proxy('api.github.com', {
-//   forceHttps  : true,
-//   prefix      : '/github',
-//   headers     : {
-//     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
+// gitProxy = proxy('api.github.com', {
+//    log : true,
+//    forceHttps : true,
+//    headers    : {
+//     'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
 //   }
-// }));
+// });
+
+// or
+
+gitProxy = proxy('api.github.com', {
+  forceHttps : true,
+  prefix     : 'github',
+  log        : true,
+  headers    : {
+    'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
+  }
+});
 
 
-//   server.listen(7000);
-// }
+server.use(gitProxy);
+server.listen(7000);
