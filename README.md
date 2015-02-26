@@ -22,10 +22,9 @@ server.use(proxy.rule('example.host.com', {
   // or
   condition : /prefix/.*/
   // or
-  only : {
+  filter : {
     match : '',
-    paths : '',
-    headers : '',
+    headers : { headerName: value},
     query : { param : value},
     body : { param: value },
     relaxed : true // match for any sinle condition
