@@ -30,12 +30,13 @@ function requestAndCompare (server, req, callback) {
 
   async.parallel([
     function superTestReq (callback) {
+      var prefix = '';
       if (req.prefix) {
-        var prefix = (!req.prefix.indexOf('/') ? req.prefix : '/' + req.prefix);
+        prefix = ((req.prefix.indexOf('/') === -1) ? req.prefix : '/' + req.prefix);
       }
 
-      superTest(server).get(prefix + req.path).end(function (res) {
-        console.log(res)
+      superTest(server).get(prefix + req.path).end(function (error, res) {
+        if (error) { throw error; }
         results.superTest = res;
         return callback();
       });
@@ -75,7 +76,6 @@ describe('Integration Test', function () {
     it('should match response from github', function (done) {
       var server = express();
       server.use(proxy(host, true));
-      server.listen('9000');
 
       requestAndCompare(server, { path : '/' }, function () {
         // server.close();
