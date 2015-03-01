@@ -48,20 +48,20 @@ function testProxyConfig (config, callback) {
 ////////////////////////////////////////////////////////////
 
 
-describe('Unit test', function () {
+// describe('Unit test', function () {
 
 
-  // Prefix
-  //
-  describe('Prefix', function () {
-    it('should set the prefix for the request', function (done) {
-      testProxyConfig({
-        prefix : prefix
-      }, function prefixCheckHook (proxyObj) {
-        console.log(proxyObj);
-        expect(proxyObj.reqOpts.path).to.equal(defaultPath);
-        done();
-      });
-    });
-  });
-});
+//   // Prefix
+//   //
+//   describe('Prefix', function () {
+//     it('should set the prefix for the request', function (done) {
+//       testProxyConfig({
+//         prefix : prefix
+//       }, function prefixCheckHook (proxyObj) {
+//         console.log(proxyObj);
+//         expect(proxyObj.reqOpts.path).to.equal(defaultPath);
+//         done();
+//       });
+//     });
+//   });
+// });
