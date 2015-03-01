@@ -19,7 +19,7 @@
     "colors": "~1.0.3"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --timeout 50000"
   },
   "licenses": [
     {
