@@ -11,11 +11,11 @@ server.use(proxy('api.github.com', {
   },
   digest : {
     pre : function (proxyObj, callback) {
-      console.log(proxyObj.reqOpts)
+      // console.log(proxyObj.reqOpts)
       return callback();
     },
     post : function (proxyObj, callback) {
-      console.log(proxyObj.result.response.request.href)
+      // console.log(proxyObj.result.response.request.href)
       return callback();
     }
   }
