@@ -16,45 +16,31 @@ var host     = 'api.github.com';
 //
 ////////////////////////////////////////////////////////////
 
-function gitReq (reqOpts, callback) {
-  var path = (!reqOpts.path.indexOf('/') ? reqOpts.path : '/' + reqOpts.path);
-
-  request(_.defaults(reqOpts, {
-    url    : ptotocol + '://' + host + path,
-    method : reqOpts.method || 'GET',
-  }), callback);
+function gitReq (req, callback) {
+  request({
+    url    : ptotocol + '://' + host + req.path,
+    method : req.method || 'GET',
+  }, callback);
 }
 
-function requestAndCompare (server, req, callback) {
-  var results = {};
-
-  async.parallel([
-    function superTestReq (callback) {
-      var prefix = '';
-      if (req.prefix) {
-        prefix = ((req.prefix.indexOf('/') === -1) ? req.prefix : '/' + req.prefix);
-      }
-
-      superTest(server).get(prefix + req.path).end(function (error, res) {
-        if (error) { throw error; }
-        results.superTest = res;
-        return callback();
+function requestAndCompare (server, req, done) {
+  async.parallel({
+    supertest: function (callback) {
+      superTest(server).get(req.path).end(function (error, response) {
+        return callback(error, response.body);
       });
     },
 
-    function testReq (callback) {
-      results.request = gitReq(req, function (error, response, body) {
-        results.trueResult = {
-          response : response,
-          body     : body
-        }
-        return callback();
+    request: function (callback) {
+      gitReq(req, function (error, response, body) {
+        return callback(error, body);
       });
     }
 
-  ], function compare () {
-      expect(results.trueResult.body).to.equal(results.superTest.body)
-      return callback();
+  }, function compare (error, results) {
+    expect(error).to.not.exist();
+    expect(results.request.body).to.equal(results.supertest.body)
+    return done();
   });
 }
 
@@ -64,50 +50,49 @@ function requestAndCompare (server, req, callback) {
 //
 ////////////////////////////////////////////////////////////
 
-// describe('Integration Test', function () {
+describe('Integration Test', function () {
 
 
-//   // Config 1
-//   //
-//   describe('(1) Pure proxy', function () {
-//     it('should match response from github', function (done) {
-//       var server = express();
-//       server.use(proxy(host, true));
-//         return done();
+  // Config 1
+  //
+  describe('(1) Pure proxy', function () {
+    it('should match response from github', function (done) {
+      var server = express();
+      server.use(proxy(host, true));
 
-//       requestAndCompare(server, { path : '/' }, function () {
-//         return done();
-//       });
-//     });
-//   });
-
-
-  // // Config 2
-  // //
-  // describe('(2) Proxy with prefix', function () {
-  //   it('should match response from github', function (done) {
-  //     var server = express();
-  //     server.use(proxy(host, '/github', true));
-
-  //     requestAndCompare(server, { path : '/', prefix : '/github' }, done);
-  //   });
-  // });
+      requestAndCompare(server, { path: '/'}, function () {
+        return done();
+      });
+    });
+  });
 
 
-  // // Config 3
-  // //
-  // describe('(3) Complex proxy', function () {
-  //   it('should match response from github', function (done) {
-  //     var server = express();
-  //     server.use(proxy(host, {
-  //       forceHttps : true,
-  //       prefix     : 'github',
-  //       headers    : {
-  //         'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
-  //       }
-  //     }));
+  // Config 2
+  //
+  describe('(2) Proxy with prefix', function () {
+    it('should match response from github', function (done) {
+      var server = express();
+      server.use(proxy(host, '/github', true));
 
-  //     requestAndCompare(server, { path : '/' }, done);
-  //   });
-  // });
-// });
+      requestAndCompare(server, { path: '/github'}, done);
+    });
+  });
+
+
+  // Config 3
+  //
+  describe('(3) Complex proxy', function () {
+    it('should match response from github', function (done) {
+      var server = express();
+      server.use(proxy(host, {
+        forceHttps : true,
+        prefix     : 'github',
+        headers    : {
+          'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
+        }
+      }));
+
+      requestAndCompare(server, { path: '/github'}, done);
+    });
+  });
+});
