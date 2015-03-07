@@ -87,7 +87,7 @@ describe('Integration Test', function () {
       server.use(proxy(host, {
         forceHttps : true,
         prefix     : 'github',
-        headers    : {
+        reqHeaders : {
           'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
         }
       }));
