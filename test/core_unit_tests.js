@@ -67,81 +67,83 @@ String.prototype.toUrl = function () {
 
 
 describe('Core Unit tests', function () {
+  describe('Config Options', function () {
 
 
-  // Prefix
-  //
-  describe('prefix', function () {
-    it('should set the prefix for the request', function (done) {
-      testProxyConfig({
-        config : { prefix : prefix },
-        result : function prefixCheckHook (proxyObj) {
-          // make sure the result is the default path without the prefix
-          var path = proxyObj.reqOpts.url.toUrl().pathname;
-          expect(path).to.equal(defaultPath);
-          return done();
-        }
-      });
-    });
-  });
-
-
-  // Force Https
-  //
-  describe('forceHttps', function () {
-    it('should set the request protocol to https', function (done) {
-      testProxyConfig({
-        config : { forceHttps : true },
-        result : function prefixCheckHook (proxyObj) {
-          // make sure the result is the default path without the prefix
-          expect(proxyObj.reqOpts.url.toUrl().protocol).to.equal('https:');
-          return done();
-        }
-      });
-    });
-  });
-
-
-  // Request Headers
-  //
-  describe('reqHeaders', function () {
-    var overrideUa     = 'test';
-    var requestHeaders = {
-      'User-Agent'      : ua,
-      'accept-language' : language
-    };
-
-    it('should override explicitly set headers', function (done) {
-      testProxyConfig({
-        request : {
-          headers : requestHeaders
-        },
-        config : {
-          reqHeaders : {
-            'User-Agent' : overrideUa
+    // Prefix
+    //
+    describe('prefix', function () {
+      it('should set the prefix for the request', function (done) {
+        testProxyConfig({
+          config : { prefix : prefix },
+          result : function prefixCheckHook (proxyObj) {
+            // make sure the result is the default path without the prefix
+            var path = proxyObj.reqOpts.url.toUrl().pathname;
+            expect(path).to.equal(defaultPath);
+            return done();
           }
-        },
-        result  : function prefixCheckHook (proxyObj) {
-          expect(proxyObj.reqOpts.headers['User-Agent']).to.equal(overrideUa);
-          return done();
-        }
+        });
       });
     });
 
-    it('should leave unspecified herders intact', function (done) {
-      testProxyConfig({
-        request : {
-          headers : requestHeaders
-        },
-        config : {
-          reqHeaders : {
-            'User-Agent' : overrideUa
+
+    // Force Https
+    //
+    describe('forceHttps', function () {
+      it('should set the request protocol to https', function (done) {
+        testProxyConfig({
+          config : { forceHttps : true },
+          result : function prefixCheckHook (proxyObj) {
+            // make sure the result is the default path without the prefix
+            expect(proxyObj.reqOpts.url.toUrl().protocol).to.equal('https:');
+            return done();
           }
-        },
-        result : function prefixCheckHook (proxyObj) {
-          expect(proxyObj.reqOpts.headers['accept-language']).to.equal(requestHeaders['accept-language']);
-          return done();
-        }
+        });
+      });
+    });
+
+
+    // Request Headers
+    //
+    describe('reqHeaders', function () {
+      var overrideUa     = 'test';
+      var requestHeaders = {
+        'User-Agent'      : ua,
+        'accept-language' : language
+      };
+
+      it('should override explicitly set headers', function (done) {
+        testProxyConfig({
+          request : {
+            headers : requestHeaders
+          },
+          config : {
+            reqHeaders : {
+              'User-Agent' : overrideUa
+            }
+          },
+          result  : function prefixCheckHook (proxyObj) {
+            expect(proxyObj.reqOpts.headers['User-Agent']).to.equal(overrideUa);
+            return done();
+          }
+        });
+      });
+
+      it('should leave unspecified herders intact', function (done) {
+        testProxyConfig({
+          request : {
+            headers : requestHeaders
+          },
+          config : {
+            reqHeaders : {
+              'User-Agent' : overrideUa
+            }
+          },
+          result : function prefixCheckHook (proxyObj) {
+            expect(proxyObj.reqOpts.headers['accept-language']).to.equal(requestHeaders['accept-language']);
+            return done();
+          }
+        });
       });
     });
   });
