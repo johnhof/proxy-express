@@ -6,8 +6,9 @@ var mocha     = require('mocha');
 var expect    = require('chai').expect;
 var async     = require('async');
 var _         = require('lodash');
+var URL       = require('url');
 
-var ptotocol    = 'https';
+var protocol    = 'https';
 var host        = 'api.github.com';
 var prefix      = '/github';
 var defaultPath = '/';
@@ -20,25 +21,28 @@ var ua          = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/2
 //
 ////////////////////////////////////////////////////////////
 
-function testProxyConfig (config, callback) {
-  var baseConfig = {
+// hacky helper to let us test config settings without a ton of setup
+function testProxyConfig (options) {
+  var proxyConfig = _.defaults(options.config, {
     headers : { 'User-Agent' : ua },
-    digest  : {
-      pre : function (proxyObj, cb) {
-        console.log('ahhhhhhhhhhh')
-        return callback(null, proxyObj);
-      }
+    pre : function (proxyObj, cb) {
+      return options.result(proxyObj);
     }
-  };
-
-  var proxyOpts = _.defaults(config, baseConfig);
+  });
 
   // build the server
   var server = express();
-  server.use(proxy(host, proxyOpts));
+  proxyConfig.shortCircuit = true;
+  server.use(proxy(host, proxyConfig));
 
   // make a simple request to trigger pre requet middleware
-  superTest(server).get(baseConfig.prefix + defaultPath).end();
+  var path = (proxyConfig.prefix || '') + defaultPath;
+  superTest(server).get(path).end();
+}
+
+//add string prototype to simplify url matching
+String.prototype.toUrl = function () {
+  return URL.parse(this.toString(), true);
 }
 
 ////////////////////////////////////////////////////////////
@@ -48,20 +52,38 @@ function testProxyConfig (config, callback) {
 ////////////////////////////////////////////////////////////
 
 
-// describe('Unit test', function () {
+describe('Unit test', function () {
 
 
-//   // Prefix
-//   //
-//   describe('Prefix', function () {
-//     it('should set the prefix for the request', function (done) {
-//       testProxyConfig({
-//         prefix : prefix
-//       }, function prefixCheckHook (proxyObj) {
-//         console.log(proxyObj);
-//         expect(proxyObj.reqOpts.path).to.equal(defaultPath);
-//         done();
-//       });
-//     });
-//   });
-// });
+  // Prefix
+  //
+  describe('Prefix', function () {
+    it('should set the prefix for the request', function (done) {
+      testProxyConfig({
+        config : { prefix : prefix },
+        result : function prefixCheckHook (proxyObj) {
+          // make sure the result is the default path without the prefix
+          var path = proxyObj.reqOpts.url.toUrl().pathname;
+          expect(path).to.equal(defaultPath);
+          return done();
+        }
+      });
+    });
+  });
+
+
+  // Force Https
+  //
+  describe('Force Https', function () {
+    it('should set the request protocol to https', function (done) {
+      testProxyConfig({
+        config : { forceHttps : true },
+        result : function prefixCheckHook (proxyObj) {
+          // make sure the result is the default path without the prefix
+          expect(proxyObj.reqOpts.url.toUrl().protocol).to.equal('https:');
+          done();
+        }
+      });
+    });
+  });
+});

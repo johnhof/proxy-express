@@ -50,49 +50,49 @@ function requestAndCompare (server, req, done) {
 //
 ////////////////////////////////////////////////////////////
 
-describe('Integration Test', function () {
+// describe('Integration Test', function () {
 
 
-  // Config 1
-  //
-  describe('(1) Pure proxy', function () {
-    it('should match response from github', function (done) {
-      var server = express();
-      server.use(proxy(host, true));
+//   // Config 1
+//   //
+//   describe('(1) Pure proxy', function () {
+//     it('should match response from github', function (done) {
+//       var server = express();
+//       server.use(proxy(host, true));
 
-      requestAndCompare(server, { path: '/'}, function () {
-        return done();
-      });
-    });
-  });
-
-
-  // Config 2
-  //
-  describe('(2) Proxy with prefix', function () {
-    it('should match response from github', function (done) {
-      var server = express();
-      server.use(proxy(host, '/github', true));
-
-      requestAndCompare(server, { path: '/github'}, done);
-    });
-  });
+//       requestAndCompare(server, { path: '/'}, function () {
+//         return done();
+//       });
+//     });
+//   });
 
 
-  // Config 3
-  //
-  describe('(3) Complex proxy', function () {
-    it('should match response from github', function (done) {
-      var server = express();
-      server.use(proxy(host, {
-        forceHttps : true,
-        prefix     : 'github',
-        reqHeaders : {
-          'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
-        }
-      }));
+//   // Config 2
+//   //
+//   describe('(2) Proxy with prefix', function () {
+//     it('should match response from github', function (done) {
+//       var server = express();
+//       server.use(proxy(host, '/github', true));
 
-      requestAndCompare(server, { path: '/github'}, done);
-    });
-  });
-});
+//       requestAndCompare(server, { path: '/github'}, done);
+//     });
+//   });
+
+
+//   // Config 3
+//   //
+//   describe('(3) Complex proxy', function () {
+//     it('should match response from github', function (done) {
+//       var server = express();
+//       server.use(proxy(host, {
+//         forceHttps : true,
+//         prefix     : 'github',
+//         reqHeaders : {
+//           'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
+//         }
+//       }));
+
+//       requestAndCompare(server, { path: '/github'}, done);
+//     });
+//   });
+// });
