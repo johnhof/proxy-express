@@ -10,7 +10,7 @@ var expect  = require('chai').expect;
 ////////////////////////////////////////////////////////////
 
 
-describe('Helpers Test', function () {
+describe('Unit Helpers Tests', function () {
 
   // Default Headers
   //

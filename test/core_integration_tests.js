@@ -50,7 +50,7 @@ function requestAndCompare (server, req, done) {
 //
 ////////////////////////////////////////////////////////////
 
-// describe('Integration Test', function () {
+// describe('Core Integration Tests', function () {
 
 
 //   // Config 1
