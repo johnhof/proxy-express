@@ -1,13 +1,15 @@
-var superTest = require('supertest');
-var request   = require('request');
-var express   = require('express');
-var proxy     = require('../lib/proxy');
-var mocha     = require('mocha');
-var expect    = require('chai').expect;
-var async     = require('async');
-var _         = require('lodash');
-var URL       = require('url');
+var superTest  = require('supertest');
+var request    = require('request');
+var express    = require('express');
+var bodyParser = require('body-parser');
+var proxy      = require('../lib/proxy');
+var mocha      = require('mocha');
+var expect     = require('chai').expect;
+var _          = require('lodash');
+var URL        = require('url');
+var QS         = require('qs');
 
+// test configurations
 var protocol    = 'https';
 var host        = 'api.github.com';
 var prefix      = '/github';
@@ -30,28 +32,48 @@ var language    = 'en-US,en;q=0.8';
 //   config  : {}, // OPTIONAL - config settings for the proxy
 //   result  : function (proxyObj) REQUIRED - callback to rest request object before it executes
 // }
-function testProxyConfig (options) {
-  var proxyConfig = _.defaults(options.config || {}, {
-    pre : function (proxyObj, cb) {
-      return options.result(proxyObj);
-    }
-  });
+function testProxyConfig (options, finalCb) {
+  // set up some defaults so we dont need to worry later
+  options                     = options || {};
+  options.request             = options.request || {};
+  options.request.headers     = options.request.headers || {};
+  options.request.query       = options.request.query || {};
+  options.request.form        = options.request.form || {};
+  options.request.method      = (options.request.method || 'GET').toLowerCase()
+  options.config              = options.config || {};
+  options.config.prefix       = options.config.prefix || '';
+  options.config.shortCircuit = true;
+
+  options.config.pre = options.config.pre || function (proxyObj, cb) {
+    return options.result(proxyObj);
+  };
+
+  options.config.post = options.config.post || function (proxyObj, cb) {
+    return options.result(proxyObj);
+  };
 
   // build the server
   var server = express();
-  proxyConfig.shortCircuit = true;
-  server.use(proxy(host, proxyConfig));
+  server.use(bodyParser.json());
+  server.use(proxy(host, options.config));
 
   // make a simple request to trigger pre requet middleware
-  var path  = (proxyConfig.prefix || '') + defaultPath;
-  var testObj = superTest(server).get(path);
+  var testObj = superTest(server)
 
-  // set supertestrequest headers
-  _.each((options.request || {}).headers || {}, function (value, key) {
-    testObj.set(key, value);
-  })
+  // set the method and path
+  testObj = testObj[options.request.method](options.config.prefix + (options.request.path || defaultPath) + '?' + QS.stringify(options.request.query));
 
-  testObj.end();
+  // set supertest request form
+  if (options.request.method != 'get') {
+    testObj = testObj.send(options.request.form);
+  }
+
+  // set supertest request headers
+  _.each(options.request.headers, function (value, key) {
+    testObj = testObj.set(key, value);
+  });
+
+  testObj.end(finalCb);
 }
 
 //add string prototype to simplify url matching
@@ -72,11 +94,11 @@ describe('Core Unit tests', function () {
 
     // Prefix
     //
-    describe('prefix', function () {
+    describe('.prefix', function () {
       it('should set the prefix for the request', function (done) {
         testProxyConfig({
           config : { prefix : prefix },
-          result : function prefixCheckHook (proxyObj) {
+          result : function testHook (proxyObj) {
             // make sure the result is the default path without the prefix
             var path = proxyObj.reqOpts.url.toUrl().pathname;
             expect(path).to.equal(defaultPath);
@@ -86,63 +108,275 @@ describe('Core Unit tests', function () {
       });
     });
 
-
-    // Force Https
+    // Restrict
     //
-    describe('forceHttps', function () {
-      it('should set the request protocol to https', function (done) {
+    describe('.restrict', function () {
+      function testRestrict (settings, callback) {
+        var handledByProxy = false;
         testProxyConfig({
-          config : { forceHttps : true },
-          result : function prefixCheckHook (proxyObj) {
-            // make sure the result is the default path without the prefix
-            expect(proxyObj.reqOpts.url.toUrl().protocol).to.equal('https:');
-            return done();
+          request : {
+            path : settings.path
+          },
+          config : {
+            restrict : settings.restrict,
+            post     : function (proxyObj, callback) { return callback(); },
+            pre      : function (proxyObj, callback) {
+              handledByProxy = true;
+              return callback();
+            },
           }
+        }, function () {
+          return callback(handledByProxy);
+        });
+      }
+
+      describe('[String]', function () {
+        it('should accept path containing substring', function (done) {
+          testRestrict({
+              path     : '/foo/bar/biz',
+              restrict : 'bar'
+          }, function (handledByProxy) {
+            expect(handledByProxy).to.equal(true);
+            return done();
+          });
+        });
+
+        it('should reject path not containing substring', function (done) {
+          testRestrict({
+              path     : '/foo/biz',
+              restrict : 'bar'
+          }, function (handledByProxy) {
+            expect(handledByProxy).to.equal(false);
+            return done();
+          });
+        });
+      });
+
+      describe('[RegExp]', function () {
+        it('should accept path matching regular expression', function (done) {
+          testRestrict({
+              path     : '/foo/bar/biz',
+              restrict : /\/bar/
+          }, function (handledByProxy) {
+            expect(handledByProxy).to.equal(true);
+            return done();
+          });
+        });
+
+        it('should reject path not matching regular expression', function (done) {
+          testRestrict({
+              path     : '/foo/bar/biz',
+              restrict : /^\/bar/
+          }, function (handledByProxy) {
+            expect(handledByProxy).to.equal(false);
+            return done();
+          });
+        });
+      });
+
+      describe('[Array]', function () {
+        it('should allow path with substring in restriction array', function (done) {
+          testRestrict({
+              path     : '/foo/bar/baz/biz',
+              restrict : [
+                'baz',
+                /\/bar/
+              ]
+          }, function (handledByProxy) {
+            expect(handledByProxy).to.equal(true);
+            return done();
+          });
+        });
+
+        it('should allow path with regex match in restriction array', function (done) {
+          testRestrict({
+              path     : '/foo/bar/biz',
+              restrict : [
+                'baz',
+                /\/bar/
+              ]
+          }, function (handledByProxy) {
+            expect(handledByProxy).to.equal(true);
+            return done();
+          });
+        });
+
+        it('should reject path without regex match or substring in restriction array', function (done) {
+          testRestrict({
+              path     : '/foobar/biz',
+              restrict : [
+                'baz',
+                /\/bar/
+              ]
+          }, function (handledByProxy) {
+            expect(handledByProxy).to.equal(false);
+            return done();
+          });
         });
       });
     });
 
 
-    // Request Headers
+    // request
     //
-    describe('reqHeaders', function () {
-      var overrideUa     = 'test';
-      var requestHeaders = {
-        'User-Agent'      : ua,
-        'accept-language' : language
-      };
+    describe('.request', function () {
 
-      it('should override explicitly set headers', function (done) {
-        testProxyConfig({
-          request : {
-            headers : requestHeaders
-          },
-          config : {
-            reqHeaders : {
-              'User-Agent' : overrideUa
+
+      // Force Https
+      //
+      describe('.forceHttps', function () {
+        it('should set the request protocol to https', function (done) {
+          testProxyConfig({
+            config : {
+              request : {
+                forceHttps : true
+              }
+            },
+            result : function testHook (proxyObj) {
+              // make sure the result is the default path without the prefix
+              expect(proxyObj.reqOpts.url.toUrl().protocol).to.equal('https:');
+              return done();
             }
-          },
-          result  : function prefixCheckHook (proxyObj) {
-            expect(proxyObj.reqOpts.headers['User-Agent']).to.equal(overrideUa);
-            return done();
-          }
+          });
         });
       });
 
-      it('should leave unspecified herders intact', function (done) {
-        testProxyConfig({
-          request : {
-            headers : requestHeaders
-          },
-          config : {
-            reqHeaders : {
-              'User-Agent' : overrideUa
+
+      // Request Headers
+      //
+      describe('.headers', function () {
+        var overrideUa     = 'test';
+        var requestHeaders = {
+          'User-Agent'      : ua,
+          'accept-language' : language
+        };
+
+        it('should override explicitly set headers', function (done) {
+          testProxyConfig({
+            request : {
+              headers : requestHeaders
+            },
+            config : {
+              request : {
+                headers : {
+                  'User-Agent' : overrideUa
+                }
+              }
+            },
+            result  : function testHook (proxyObj) {
+              expect(proxyObj.reqOpts.headers['User-Agent']).to.equal(overrideUa);
+              return done();
             }
-          },
-          result : function prefixCheckHook (proxyObj) {
-            expect(proxyObj.reqOpts.headers['accept-language']).to.equal(requestHeaders['accept-language']);
-            return done();
-          }
+          });
+        });
+
+        it('should leave unspecified headers intact', function (done) {
+          testProxyConfig({
+            request : {
+              headers : requestHeaders
+            },
+            config : {
+              request : {
+                headers : {
+                  'User-Agent' : overrideUa
+                }
+              }
+            },
+            result : function testHook (proxyObj) {
+              expect(proxyObj.reqOpts.headers['accept-language']).to.equal(requestHeaders['accept-language']);
+              return done();
+            }
+          });
+        });
+      });
+
+      // Request Query
+      //
+      describe('.query', function () {
+        var overrideQuery = { test: 'foo' };
+        var requestQuery  = {
+          test : 'bar',
+          biz  : 'baz'
+        };
+
+        it('should override explicitly set query params', function (done) {
+          testProxyConfig({
+            request : {
+              query : requestQuery
+            },
+            config : {
+              request : {
+                query : overrideQuery
+              }
+            },
+            result  : function testHook (proxyObj) {
+              expect(proxyObj.reqOpts.qs.test).to.equal(overrideQuery.test);
+              return done();
+            }
+          });
+        });
+
+        it('should leave unspecified query params intact', function (done) {
+          testProxyConfig({
+            request : {
+              query : requestQuery
+            },
+            config : {
+              request : {
+                query : overrideQuery
+              }
+            },
+            result : function testHook (proxyObj) {
+              expect(proxyObj.reqOpts.qs.biz).to.equal(requestQuery.biz);
+              return done();
+            }
+          });
+        });
+      });
+
+      // Request Form
+      //
+      describe('.form', function () {
+        var overrideForm = { test: 'foo' };
+        var requestForm  = {
+          test : 'bar',
+          biz  : 'baz'
+        };
+
+        it('should override explicitly set form properties', function (done) {
+          testProxyConfig({
+            request : {
+              method : 'POST',
+              form   : requestForm
+            },
+            config : {
+              request : {
+                form : overrideForm
+              }
+            },
+            result  : function testHook (proxyObj) {
+              expect(proxyObj.reqOpts.form.test).to.equal(overrideForm.test);
+              return done();
+            }
+          });
+        });
+
+        it('should leave unspecified form properties intact', function (done) {
+          testProxyConfig({
+            request : {
+              method : 'POST',
+              form   : requestForm
+            },
+            config : {
+              request : {
+                form : overrideForm
+              }
+            },
+            result : function testHook (proxyObj) {
+              expect(proxyObj.reqOpts.form.biz).to.equal(requestForm.biz);
+              return done();
+            }
+          });
         });
       });
     });
