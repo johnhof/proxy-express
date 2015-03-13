@@ -1,0 +1,40 @@
+{
+  "name": "express-proxy",
+  "author": "John Hofrichter <https://github.com/johnhof>",
+  "description": "Request proxying middleware for express",
+  "version": "0.0.0",
+  "repository": "git://github.com/johnhof/express-proxy",
+  "main": "lib/proxy.js",
+  "keywords": [
+    "proxy",
+    "express"
+  ],
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "dependencies": {
+    "async": "^0.9.x",
+    "lodash": "2.4.x",
+    "request": "^2.53.x",
+    "colors": "~1.0.3"
+  },
+  "scripts": {
+    "test": "mocha --timeout 50000"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/johnhof/express-proxy/blob/master/LICENSE-MIT"
+    }
+  ],
+  "devDependencies": {
+    "body-parser": "^1.12.0",
+    "chai": "1.10.x",
+    "express": "^4.12.x",
+    "mocha": "1.21.x",
+    "qs": "^2.3.3",
+    "should": "1.1.x",
+    "supertest": "^0.15.0",
+    "url": "^0.10.3"
+  }
+}
