@@ -1,11 +1,35 @@
 Express Proxy
 =============
 
+[![Build Status](https://travis-ci.org/johnhof/express-proxy.svg?branch=master)](https://travis-ci.org/johnhof/express-proxy)
+
 A configurable proxy as express middleware
 
 ### this module is still in pre-production. use is not recommended
 
-Example server
+- [Usage](#usage)
+    - ['Server example'](#server-example)
+- [Proxy Types](#proxy-types)
+    - [Pure proxy](#pure-proxy)
+    - [Proxy With Prefix](#proxy-with-prefix)
+    - [Proxy With Configuration](#proxy-with-confix)
+- [Configuration Options](#configuration-options)
+    - [.prefix](#prefix)
+    - [.restrict](#restrict)
+    - [.request](#request)
+      - [.forceHttps](#forcehttps)
+      - [.headers](#headers)
+      - [.query](#query)
+      - [.form](#form)
+    - [.pre](#pre)
+    - [.post](#post)
+- [Example Configuration](#example-configuration)
+
+# Usage
+
+This module is designed to simplify server logic when utilizing 3rd party API's. If the server is serving an application using any number of 3rd party API's, express-proxy can reduce server code to a single file.
+
+### Server example
 
 ```javascript
 var proxy  = require('express-proxy');
@@ -19,87 +43,186 @@ server.use(proxy('api.travis.com', '/travis'));
 server.use(proxy('jira.atlassian.com', '/jira'));
 
 server.use(proxy('api.github.com', {
-  forceHttps : true,
-  prefix     : 'github',
-  headers    : {
-    'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
+  prefix  : 'github',
+  request : {
+    forceHttps : true,
+    headers    : {
+      'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
+    }
   }
 }));
 
 server.listen(7000);
 ```
 
-## Proxy options
+# Proxy types
 
-### Simple proxy
+## Pure proxy
 
-Forward all results to the host specified. if `forceHttps` is `true`, all requests to the proxied server will be https
+Forward all requests to the host specified. if `forceHttps` is `true`, all requests to the proxied server will be https
 
 ```javascript
   server.use(proxy('www.foo.com'), [forceHttps]);
+  // [METHOD] /* => proxied to the 3rd party server
 ```
 
-### Simple proxy with prefit
+## Proxy With Prefix
 
-Forward all results to the host specified. Only requests made with the prefix in the URL will be run through the proxy. The prefix will be stripped from the request before it's made to the proxied server. if `forceHttps` is `true`, all requests to the proxied server will be https
+Forward all requests to the host specified. Only requests made with the prefix in the URL will be run through the proxy. The prefix will be stripped from the request before it's made to the proxied server. if `forceHttps` is `true`, all requests to the proxied server will be https
 
-forward
 
 ```javascript
   server.use(proxy('www.foo.com', '/foo', [forceHttps]));
-  // GET /users => ignored by proxy
-  // GET /foo/users => proxied to GET www.foo.com/users
+  // [METHOD] /users => ignored by proxy
+  // [METHOD] /foo/users => proxied to [METHOD] //www.foo.com/users
 ```
 
-### Cofigured proxy
+## Proxy With Configuration
 
-Allows complex configuration. More details in the config section
+Allows complex configuration. More details in the [configuration section](#configuration-options)
 
 ```javascript
   server.use(proxy('ww.foo.com', {
-    forceHttps : true,
-    prefix     : 'github',
-    headers    : {
-      'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
+    prefix  : 'foo',
+    request : {
+      forceHttps : true,
+      headers    : {
+        'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
+      }
     }
   }));
+
+  // [METHOD] /users => ignored by proxy
+  // [METHOD] /foo/users => proxied to [METHOD] https://www.foo.com/users with 'User-Agent' set
 ```
 
-## Config options
+# Configuration Options
 
-The following config options are allowed
+The following configuration options are allowed
+
+## .prefix
+
+Type: `String`
+
+The proxy will  match any route with the leading prefix. The prefix will be removed before the request is submitted to the proxied server
 
 ```javascript
-{
-  // Prefix : Only requests made with the prefix in the URL will be run through the proxy.
-  //   The prefix will be stripped from the request before it's made to the proxied server
-  prefix : String
+proxy('www.foo.com', {
+  prefix : '/foo'
+  // /foo/test => /test
+  // /test => ignored by proxy
+});
+```
 
-  // Restrict : Matches against the request path. paths which fail to match are ignored
-  //   String => accepts paths containing the restricted substring
-  //   RegExp => accepts paths matching the restricted regex
-  //   Array => accepts paths matching at leas one of its String/RegExp matches
-  restrict : String || RegExp || Array,
+## .restrict
 
-  // Request : used to override values from incoming requests
-  request {
+Type : `String || RegExp || Array`
 
-    // Force Https : if true, all requsts to proxied server are made in https
-    forceHttps : Boolean,
+Only routes matching the restrictions will be run through the proxy
 
-    // Headers : each key/value pair is applied to the proxied request headers
-    headers : Object,
+```javascript
+proxy('www.foo.com', {
+  restrict : 'bar'
+  // /biz/bar => proxied
+  // /biz => ignored
+});
 
-    // Query : each key/value pair is applied to the proxied request query string
-    query : Object,
+// OR
 
-    // Form : each key/value pair is applied to the proxied request form body (requires that the server uses bodyParser)
-    form : Object,
-  },
+proxy('www.foo.com', {
+  restrict : /\/bar$/
+  // /biz/bar => proxied
+  // /bar/biz => ignored
+});
 
+// OR
 
-  // Pre : occurs before request is made. updates to proxyObj will affec tthe proxy request
-  pre : function (proxyObj, callback) {
+proxy('www.foo.com', {
+  restrict : [/\/bar$/, 'foo']
+  // /biz/bar => proxied
+  // /biz/foo/baz => proxied
+  // /bar/biz => ignored
+});
+```
+
+## .request
+
+Type: `Object`
+
+All options set in the request proper will be applied to the proxy request
+
+### .forceHttps
+
+Type: `Boolean`
+
+If true, all requests to teh proxied server will be made over https
+
+```javascript
+proxy('www.foo.com', {
+  request : {
+    forceHttps : true
+  }
+});
+```
+
+### .headers
+
+Type: `Object`
+
+Any header key/value pair will override the headers being proxied by to the 3rd party server. setting a header to `undefined` will remove it from the proxied request
+
+```javascript
+proxy('www.foo.com', {
+  request : {
+    headers : {
+      'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
+      'accept-language' : undefined // deleted from all proxied requests
+    }
+  }
+});
+
+### .query
+
+Type: `Object`
+
+Any query key/value pair will override the query being proxied by to the 3rd party server
+
+```javascript
+proxy('www.foo.com', {
+  request : {
+    query : {
+      type : 'proxied' // /foo => /foo?type=proxied
+    }
+  }
+});
+
+### .form
+
+Type: `Object`
+
+Requires:  `bodyParser.json()`
+
+Any form key/value pair will override the form/body being proxied by to the 3rd party server
+
+```javascript
+proxy('www.foo.com', {
+  request : {
+    form : {
+      type : 'proxied'
+    }
+  }
+});
+```
+
+## .pre
+
+Type : `function || Array`
+
+The function passed in will be run ad a callback before the request is made. any changes to `prodyObj.reqOpts` will be used in the request. The reqOpts object will be passed directy into the [request module](https://www.npmjs.com/package/request) after the callback is executed. If using this funciton. please familiarize yourself with the [request module](https://www.npmjs.com/package/request). If an array of functions are sumitted, they will be executed synchronously
+
+```javascript
+proxy('www.foo.com', {
+  pre : function (proxyObj) {
     // proxyObj contains
     // {
     //   req      : Object // express request
@@ -108,20 +231,65 @@ The following config options are allowed
     // }
     return callback();
   }
+});
+```
 
-  // Post : occurs after request is made. updates to proxyObj will affect the response to the client
-  post : function (proxyObj, callback) {
+## .post
+
+Type : `function || Array`
+
+The function passed in will be run ad a callback after the request is made. any changes to `prodyObj.res` and `proxyObj.result` will be used in the response. `proxyObj.result.response` is the response object returned from the [request module](https://www.npmjs.com/package/request). If an array of functions are sumitted, they will be executed synchronously
+
+```javascript
+proxy('www.foo.com', {
+  post : function (proxyObj) {
     // proxyObj contains
     // {
     //   req      : Object // express request
     //   res      : Object // express request
     //   proxyObj : Object // object used in the 'request' module request
-    //   result   : Object // contains 'response' and 'body' objects
+    //   result   : {
+    //     response : Object, // response object from the proxied request
+    //     body     : Mixed // response body from the proxied request
+    //   }
     // }
+    return callback();
+  }
+});
+```
+# Example configuration
+
+below is a configuration using all of the available components.
+
+```javascript
+{
+  prefix : String
+  restrict : [],
+  request {
+    forceHttps : true,
+      headers : {'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0'
+    },
+    query : {
+      isProxied : 'true'
+    },
+    form : {
+      isProxied : 'true'
+    },
+  },
+  before : function (proxyObj, callback) {
+    console.log('sending headers ')
+    console.log(proxyObj.reqOpts.headers);
+    return callback();
+  }
+
+  after : function (proxyObj, callback) {
+    console.log('returned headers ')
+    console.log(proxyObj.result.response.headers);
     return callback();
   }
 }
 ```
+
 
 ## Tests
 
