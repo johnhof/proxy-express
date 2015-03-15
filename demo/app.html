@@ -25,7 +25,7 @@
 
       $.get('/status', printResponse('health'));
       $.get('/github/users/johnhof', printResponse('github'));
-      $.get('/travis/repos/johnhof/express-proxy/builds', printResponse('travis'));
+      $.get('/travis/repos/johnhof/proxy-express/builds', printResponse('travis'));
 
       function printResponse (name) {
         return function (data) {

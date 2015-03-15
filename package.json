@@ -8,7 +8,7 @@
   "keywords": [
     "proxy",
     "express",
-    "express-proxy",
+    "proxy-express",
     "forward",
     "passthrough"
   ],

@@ -1,11 +1,11 @@
 Express Proxy
 =============
 
-[![Build Status](https://travis-ci.org/johnhof/express-proxy.svg?branch=master)](https://travis-ci.org/johnhof/express-proxy)
+[![Build Status](https://travis-ci.org/johnhof/proxy-express.svg?branch=master)](https://travis-ci.org/johnhof/proxy-express)
 
 This module is designed to simplify server logic when utilizing 3rd party API's. Several API's can be used in conjunction, and the proxy can be used in tandem with server defined routes.
 
-[demo](https://github.com/johnhof/express-proxy/tree/master/demo) - `$ node ./demo/server`
+[demo](https://github.com/johnhof/proxy-express/tree/master/demo) - `$ node ./demo/server`
 
 # Key
 
@@ -29,10 +29,10 @@ This module is designed to simplify server logic when utilizing 3rd party API's.
 
 # Server Example
 
-**Note:** for a fully funcitonal demo, clone and run `node ./demo/server` and take a look at the code [here](https://github.com/johnhof/express-proxy/tree/master/demo)
+**Note:** for a fully funcitonal demo, clone and run `node ./demo/server` and take a look at the code [here](https://github.com/johnhof/proxy-express/tree/master/demo)
 
 ```javascript
-var proxy  = require('express-proxy');
+var proxy  = require('proxy-express');
 var routes = require('/routes');
 var server = require('express')();
 
