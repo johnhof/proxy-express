@@ -2,7 +2,7 @@
   "name": "express-proxy",
   "author": "John Hofrichter <https://github.com/johnhof>",
   "description": "Request proxying middleware for express",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "repository": "git://github.com/johnhof/express-proxy",
   "main": "lib/proxy.js",
   "keywords": [
