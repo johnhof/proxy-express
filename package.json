@@ -1,13 +1,16 @@
 {
-  "name": "express-proxy",
+  "name": "proxy-express",
   "author": "John Hofrichter <https://github.com/johnhof>",
   "description": "Request proxying middleware for express",
   "version": "1.0.0",
-  "repository": "git://github.com/johnhof/express-proxy",
+  "repository": "git://github.com/johnhof/proxy-express",
   "main": "lib/proxy.js",
   "keywords": [
     "proxy",
-    "express"
+    "express",
+    "express-proxy",
+    "forward",
+    "passthrough"
   ],
   "engines": {
     "node": ">=0.8.0"
@@ -24,7 +27,7 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/johnhof/express-proxy/blob/master/LICENSE-MIT"
+      "url": "https://github.com/johnhof/proxy-express/blob/master/LICENSE-MIT"
     }
   ],
   "devDependencies": {
