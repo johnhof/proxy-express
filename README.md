@@ -58,7 +58,7 @@ server.listen(7000);
 
 ## Pure proxy
 
-Forward all requests to the host specified. if `forceHttps` is `true`, all requests to the proxied server will be https
+Forward all requests to the host specified. If `forceHttps` is `true`, all requests to the proxied server will be https
 
 ```javascript
   server.use(proxy('www.foo.com'), [forceHttps]);
@@ -184,7 +184,7 @@ Type: `Boolean`
 
 Default: `true`
 
-If true, all redirects returned from teh proxied server will be followed before returning contnent
+If true, all redirects returned from the proxied server will be followed before returning content
 
 ```javascript
 proxy('www.foo.com', {
@@ -198,7 +198,7 @@ proxy('www.foo.com', {
 
 Type: `Object`
 
-Any header key/value pair will override the headers being proxied by to the 3rd party server. setting a header to `undefined` will remove it from the proxied request
+Any header key/value pair will override the headers being proxied by to the 3rd party server. Setting a header to `undefined` will remove it from the proxied request
 
 ```javascript
 proxy('www.foo.com', {
@@ -249,7 +249,7 @@ proxy('www.foo.com', {
 
 Type : `function || Array`
 
-The function passed in will be run ad a callback before the request is made. any changes to `prodyObj.reqOpts` will be used in the request. The reqOpts object will be passed directy into the [request module](https://www.npmjs.com/package/request) after the callback is executed. If using this funciton. please familiarize yourself with the [request module](https://www.npmjs.com/package/request). If an array of functions are sumitted, they will be executed synchronously
+The function passed in will be run ad a callback before the request is made. any changes to `proxyObj.reqOpts` will be used in the request. The reqOpts object will be passed directy into the [request module](https://www.npmjs.com/package/request) after the callback is executed. If using this function. please familiarize yourself with the [request module](https://www.npmjs.com/package/request). If an array of functions are submitted, they will be executed synchronously
 
 ```javascript
 proxy('www.foo.com', {
@@ -269,7 +269,7 @@ proxy('www.foo.com', {
 
 Type : `function || Array`
 
-The function passed in will be run ad a callback after the request is made. any changes to `prodyObj.res` and `proxyObj.result` will be used in the response. `proxyObj.result.response` is the response object returned from the [request module](https://www.npmjs.com/package/request). If an array of functions are sumitted, they will be executed synchronously
+The function passed in will be run ad a callback after the request is made. any changes to `proxyObj.res` and `proxyObj.result` will be used in the response. `proxyObj.result.response` is the response object returned from the [request module](https://www.npmjs.com/package/request). If an array of functions are submitted, they will be executed synchronously
 
 ```javascript
 proxy('www.foo.com', {
