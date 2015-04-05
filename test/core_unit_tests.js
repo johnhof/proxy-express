@@ -58,7 +58,7 @@ function testProxyConfig (options, finalCb) {
   server.use(proxy(host, options.config));
 
   // make a simple request to trigger pre requet middleware
-  var testObj = superTest(server)
+  var testObj = superTest(server);
 
   // set the method and path
   testObj = testObj[options.request.method](options.config.prefix + (options.request.path || defaultPath) + '?' + QS.stringify(options.request.query));
@@ -236,6 +236,29 @@ describe('Core Unit tests', function () {
             result : function testHook (proxyObj) {
               // make sure the result is the default path without the prefix
               expect(proxyObj.reqOpts.url.toUrl().protocol).to.equal('https:');
+              return done();
+            }
+          });
+        });
+      });
+
+
+      // Prepend Request
+      //
+      describe('.prepend', function () {
+        it('should prepend `/foo/bar/test` to the request', function (done) {
+          var prepend = 'foo/bar/test';
+          testProxyConfig({
+            request : {
+              path: '/biz'
+            },
+            config : {
+              request : {
+                prepend : prepend
+              }
+            },
+            result : function testHook (proxyObj) {
+              expect(proxyObj.reqOpts.url.toUrl().pathname).to.have.string(prepend);
               return done();
             }
           });

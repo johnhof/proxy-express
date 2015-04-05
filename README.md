@@ -16,11 +16,12 @@ This module is designed to simplify server logic when utilizing 3rd party API's.
     - [.prefix](#prefix)
     - [.restrict](#restrict)
     - [.request](#request)
-      - [.forceHttps](#forcehttps)
-      - [.followRedirects](#followredirects)
-      - [.headers](#headers)
-      - [.query](#query)
-      - [.form](#form)
+        - [.forceHttps](#forcehttps)
+        - [.prepend](#prepend)
+        - [.followRedirects](#followredirects)
+        - [.headers](#headers)
+        - [.query](#query)
+        - [.form](#form)
     - [.pre](#pre)
     - [.post](#post)
     - [.log](#log)
@@ -159,6 +160,20 @@ If true, all requests to the proxied server will be made over https
 proxy('www.foo.com', {
   request : {
     forceHttps : true
+  }
+});
+```
+
+### .prepend
+
+Type: `Boolean`
+
+The path to be prepended to every request throught the proxy
+
+```javascript
+proxy('www.foo.com', {
+  request : {
+    prepend : 'foo/v0'
   }
 });
 ```
