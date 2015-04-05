@@ -166,7 +166,7 @@ proxy('www.foo.com', {
 
 ### .prepend
 
-Type: `Boolean`
+Type: `String`
 
 The path to be prepended to every request throught the proxy
 
