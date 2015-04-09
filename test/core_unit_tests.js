@@ -88,7 +88,7 @@ String.prototype.toUrl = function () {
 ////////////////////////////////////////////////////////////
 
 
-describe('Core Unit tests', function () {
+describe('Core Unit Tests', function () {
   describe('Config Options', function () {
 
 

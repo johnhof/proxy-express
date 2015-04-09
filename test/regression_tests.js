@@ -6,14 +6,14 @@ var expect     = require('chai').expect;
 
 ////////////////////////////////////////////////////////////
 //
-// Integration tests
+// Regression tests
 //
 ////////////////////////////////////////////////////////////
 
 
-describe('Core Integration Tests', function () {
-  describe('Smoke test', function () {
-    it('should make a basic request to github', function (done) {
+describe('Regression Tests', function () {
+  describe('Status Code', function () {
+    it('should properly proxy non 200 responses', function (done) {
       var server = express();
 
       server.use(proxy('api.github.com', {
@@ -26,7 +26,7 @@ describe('Core Integration Tests', function () {
         }
       }));
 
-      superTest(server).get('/github').expect(200).end(done);
+      superTest(server).get('/github/four/oh/four').expect(404).end(done);
     })
   });
 });
