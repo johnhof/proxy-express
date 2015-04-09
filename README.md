@@ -168,7 +168,7 @@ proxy('www.foo.com', {
 
 Type: `String`
 
-The path to be prepended to every request throught the proxy
+The path to be prepended to every request through the proxy
 
 ```javascript
 proxy('www.foo.com', {
