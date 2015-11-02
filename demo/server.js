@@ -23,6 +23,16 @@ server.use(proxy('api.github.com', {
   }
 }));
 
+server.use(proxy('i.imgur.com', {
+  prefix  : '/imgur',
+  log  : true,
+  request : {
+    headers    : {
+      'User-Agent' : 'Mozilla/5.0 (X11; Linux i686 (x86_64)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36',
+    }
+  }
+}));
+
 // simple server health check
 server.get('/status', function (req, res) {
   res.send('OK');
