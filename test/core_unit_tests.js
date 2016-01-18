@@ -36,7 +36,7 @@ function testProxyConfig (options, finalCb) {
   // set up some defaults so we dont need to worry later
   options                     = options || {};
   options.request             = options.request || {};
-  options.request.headers     = options.request.headers || {};
+  options.request.headers     = _.defaults({},options.request.headers || {},{Authorization:require('./github_auth_header')}),
   options.request.query       = options.request.query || {};
   options.request.form        = options.request.form || {};
   options.request.method      = (options.request.method || 'GET').toLowerCase()
