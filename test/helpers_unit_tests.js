@@ -1,7 +1,7 @@
 var helpers = require('../lib/helpers');
 var mocha   = require('mocha');
 var expect  = require('chai').expect;
-
+var _       = require('lodash');
 
 ////////////////////////////////////////////////////////////
 //
@@ -27,7 +27,7 @@ describe('Helpers Unit Tests', function () {
 
     it('should override existing headers', function () {
       expect(result.foo).to.equal(success)
-    })
+    });
 
     it('should preserve headers not explicitly overridden', function () {
       expect(result.baz).to.equal(success)
@@ -41,23 +41,72 @@ describe('Helpers Unit Tests', function () {
   // Matches Restriction
   //
   describe('matchesRestriction', function () {
-    var regExp = /.+\/bar/
-    var string = 'foo'
+    var regExp = /.+\/bar/;
+    var string = 'foo';
 
     it('should return true for path matching regex', function () {
-      expect(helpers.matchesRestriction('/foo/bar', regExp)).to.equal(true);
+      expect(helpers.matchesRestriction({url:'/foo/bar'}, regExp)).to.equal(true);
     });
 
     it('should return false for path failing to match regexp', function () {
-      expect(helpers.matchesRestriction('/bar/foo', regExp)).to.equal(false);
+      expect(helpers.matchesRestriction({url:'/bar/foo'}, regExp)).to.equal(false);
     });
 
     it('should return true for path containing string', function () {
-      expect(helpers.matchesRestriction('/foo/bar', string)).to.equal(true);
+      expect(helpers.matchesRestriction({url:'/foo/bar'}, string)).to.equal(true);
     });
 
     it('should return false for path containing string', function () {
-      expect(helpers.matchesRestriction('/bar/biz', string)).to.equal(false);
+      expect(helpers.matchesRestriction({url:'/bar/biz'}, string)).to.equal(false);
+    });
+
+    describe('with a filter function', function () {
+      describe('returning boolean', function(){
+        it('should return false for a function that returns false', function() {
+          expect(helpers.matchesRestriction({url:'/bar/biz'}, function(){ return false; })).to.equal(false);
+        });
+
+        it('should return true for a function that returns true', function() {
+          expect(helpers.matchesRestriction({url:'/bar/biz'}, function(){ return true; })).to.equal(true);
+        });
+      });
+
+      describe('returning a string', function(){
+        it('should return true for a path containing a string', function() {
+          expect(helpers.matchesRestriction({url:'/foo/bar'}, function(){ return string; })).to.equal(true);
+        });
+
+        it('should return false for a path containing string', function () {
+          expect(helpers.matchesRestriction({url:'/bar/biz'}, function(){ return string; })).to.equal(false);
+        });
+      });
+
+      describe('returning a regexp', function(){
+        it('should return true for path matching regex', function () {
+          expect(helpers.matchesRestriction({url:'/foo/bar'}, function(){ return regExp; })).to.equal(true);
+        });
+
+        it('should return false for path failing to match regexp', function () {
+          expect(helpers.matchesRestriction({url:'/bar/foo'}, function(){ return regExp; })).to.equal(false);
+        });
+      });
+
+      describe('returning a function', function() {
+        describe('returning boolean', function () {
+          it('should return false for a function that returns false', function () {
+            expect(helpers.matchesRestriction({url: '/bar/biz'}, function () {
+              return _.constant(false);
+            })).to.equal(false);
+          });
+
+          it('should return true for a function that returns true', function () {
+            expect(helpers.matchesRestriction({url: '/bar/biz'}, function () {
+              return _.constant(true);
+            })).to.equal(true);
+          });
+        });
+      });
+
     });
   });
 });
