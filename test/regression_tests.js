@@ -22,7 +22,8 @@ describe('Regression Tests', function () {
           forceHttps : true,
           strictSSL  : false,
           headers    : {
-            'User-Agent' : 'Mozilla/5.0 (X11; Linux i686 (x86_64)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36'
+            'User-Agent' : 'Mozilla/5.0 (X11; Linux i686 (x86_64)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36',
+            Authorization : require('./github_auth_header')
           }
         }
       }));
