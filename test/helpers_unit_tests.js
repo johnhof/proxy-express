@@ -107,6 +107,27 @@ describe('Helpers Unit Tests', function () {
         });
       });
 
+      describe('with an array', function () {
+        it('should return false if all array values return false', function() {
+          expect(helpers.matchesRestriction({url: '/bar/biz'}, [
+            regExp,
+            string,
+            false,
+            function () { return _.constant(false); }
+          ])).to.equal(false);
+        });
+
+        it('should return true if one array value returns true', function() {
+          expect(helpers.matchesRestriction({url: '/bar/biz'}, [
+            regExp,
+            string,
+            false,
+            function () { return _.constant(true); }
+          ])).to.equal(true);
+        });
+
+      });
+
     });
   });
 });
