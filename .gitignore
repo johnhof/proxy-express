@@ -3,4 +3,6 @@ dist
 .tmp
 .sass-cache
 *.log
+/proxy-express.iml
+/.idea
 .test*
