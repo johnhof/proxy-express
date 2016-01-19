@@ -17,6 +17,7 @@ This module is designed to simplify server logic when utilizing 3rd party API's.
     - [.restrict](#restrict)
     - [.request](#request)
         - [.forceHttps](#forcehttps)
+        - [.strictSSL](#strictssl)
         - [.prepend](#prepend)
         - [.followRedirects](#followredirects)
         - [.headers](#headers)
@@ -115,7 +116,7 @@ proxy('www.foo.com', {
 
 ## .restrict
 
-Type : `String || RegExp || Array`
+Type : `String || RegExp || Array || Function`
 
 Only routes matching the restrictions will be run through the proxy
 
@@ -144,6 +145,17 @@ proxy('www.foo.com', {
 });
 ```
 
+// OR
+
+proxy('www.foo.com', {
+  restrict : function(req){
+    return req.get('force-proxy') !=== undefined
+  }
+  // curl -H force-proxy:foobar http://127.0.0.1/anything
+  // => proxied
+});
+```
+
 ## .request
 
 Type: `Object`
@@ -160,6 +172,22 @@ If true, all requests to the proxied server will be made over https
 proxy('www.foo.com', {
   request : {
     forceHttps : true
+  }
+});
+```
+
+### .strictSSL
+
+Type: `Boolean`
+Default: `true`
+
+Whether or not to do SSL key validation when making requests to the registry via https.
+This is similar to the git/npm/request setting of the same name; useful if you're behind a proxy.
+
+```javascript
+proxy('www.foo.com', {
+  request : {
+    strictSSL : false
   }
 });
 ```
