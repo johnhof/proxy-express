@@ -126,17 +126,21 @@ proxy('www.foo.com', {
   // /biz/bar => proxied
   // /biz => ignored
 });
+```
 
 // OR
 
+```javascript
 proxy('www.foo.com', {
   restrict : /\/bar$/
   // /biz/bar => proxied
   // /bar/biz => ignored
 });
+```
 
 // OR
 
+```javascript
 proxy('www.foo.com', {
   restrict : [/\/bar$/, 'foo']
   // /biz/bar => proxied
@@ -147,6 +151,7 @@ proxy('www.foo.com', {
 
 // OR
 
+```javascript
 proxy('www.foo.com', {
   restrict : function(req){
     return req.get('force-proxy') !=== undefined
