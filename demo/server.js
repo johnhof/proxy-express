@@ -51,5 +51,5 @@ server.get('*', function (req, res) {
   res.sendFile(__dirname + '/app.html');
 });
 
-console.log('\nserver listening...\n')
-server.listen(8000)
+console.log('\nserver listening on port: 8000\n');
+server.listen(8000);
