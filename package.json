@@ -2,7 +2,7 @@
   "name": "proxy-express",
   "author": "John Hofrichter <https://github.com/johnhof>",
   "description": "Request proxying middleware for express",
-  "version": "1.2.2",
+  "version": "2.0.0",
   "repository": "git://github.com/johnhof/proxy-express",
   "main": "lib/proxy.js",
   "keywords": [
@@ -13,7 +13,7 @@
     "passthrough"
   ],
   "engines": {
-    "node": ">=0.8.0"
+    "node": ">=4.4.0"
   },
   "dependencies": {
     "async": "^0.9.x",
@@ -22,7 +22,8 @@
     "colors": "~1.0.3"
   },
   "scripts": {
-    "test": "mocha --timeout 50000"
+    "test": "mocha",
+    "coverage": "istanbul cover _mocha --report lcovonly -- -R spec"
   },
   "licenses": [
     {
@@ -34,7 +35,8 @@
     "body-parser": "^1.12.0",
     "chai": "1.10.x",
     "express": "^4.12.x",
-    "mocha": "1.21.x",
+    "istanbul": "^0.4.2",
+    "mocha": "2.4.x",
     "qs": "^2.3.3",
     "should": "1.1.x",
     "supertest": "^0.15.0",

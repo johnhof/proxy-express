@@ -1,8 +1,10 @@
-var superTest  = require('supertest');
-var express    = require('express');
-var proxy      = require('../lib/proxy');
-var mocha      = require('mocha');
-var expect     = require('chai').expect;
+'use strict';
+
+const superTest  = require('supertest');
+const express    = require('express');
+const proxy      = require('../lib/proxy');
+const mocha      = require('mocha');
+const expect     = require('chai').expect;
 
 ////////////////////////////////////////////////////////////
 //
@@ -14,7 +16,7 @@ var expect     = require('chai').expect;
 describe('Regression Tests', function () {
   describe('Status Code', function () {
     it('should properly proxy non 200 responses', function (done) {
-      var server = express();
+      let server = express();
 
       server.use(proxy('api.github.com', {
         prefix  : 'github',
@@ -29,6 +31,6 @@ describe('Regression Tests', function () {
       }));
 
       superTest(server).get('/github/four/oh/four').expect(404).end(done);
-    })
+    });
   });
 });

@@ -6,3 +6,4 @@ dist
 /proxy-express.iml
 /.idea
 .test*
+/coverage

@@ -1,21 +1,23 @@
-var superTest  = require('supertest');
-var request    = require('request');
-var express    = require('express');
-var bodyParser = require('body-parser');
-var proxy      = require('../lib/proxy');
-var mocha      = require('mocha');
-var expect     = require('chai').expect;
-var _          = require('lodash');
-var URL        = require('url');
-var QS         = require('qs');
+'use strict';
+
+const superTest  = require('supertest');
+const request    = require('request');
+const express    = require('express');
+const bodyParser = require('body-parser');
+const proxy      = require('../lib/proxy');
+const mocha      = require('mocha');
+const expect     = require('chai').expect;
+const _          = require('lodash');
+const URL        = require('url');
+const QS         = require('qs');
 
 // test configurations
-var protocol    = 'https';
-var host        = 'api.github.com';
-var prefix      = '/github';
-var defaultPath = '/';
-var ua          = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0';
-var language    = 'en-US,en;q=0.8';
+const protocol    = 'https';
+const host        = 'api.github.com';
+const prefix      = '/github';
+const defaultPath = '/';
+const ua          = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0';
+const language    = 'en-US,en;q=0.8';
 
 
 ////////////////////////////////////////////////////////////
@@ -53,18 +55,18 @@ function testProxyConfig (options, finalCb) {
   };
 
   // build the server
-  var server = express();
+  let server = express();
   server.use(bodyParser.json());
   server.use(proxy(host, options.config));
 
   // make a simple request to trigger pre requet middleware
-  var testObj = superTest(server);
+  let testObj = superTest(server);
 
   // set the method and path
   testObj = testObj[options.request.method](options.config.prefix + (options.request.path || defaultPath) + '?' + QS.stringify(options.request.query));
 
   // set supertest request form
-  if (options.request.method != 'get') {
+  if (options.request.method !== 'get') {
     testObj = testObj.send(options.request.form);
   }
 
@@ -76,10 +78,10 @@ function testProxyConfig (options, finalCb) {
   testObj.end(finalCb);
 }
 
-//add string prototype to simplify url matching
+// add string prototype to simplify url matching
 String.prototype.toUrl = function () {
   return URL.parse(this.toString(), true);
-}
+};
 
 ////////////////////////////////////////////////////////////
 //
@@ -87,11 +89,8 @@ String.prototype.toUrl = function () {
 //
 ////////////////////////////////////////////////////////////
 
-
 describe('Core Unit Tests', function () {
   describe('Config Options', function () {
-
-
     // Prefix
     //
     describe('.prefix', function () {
@@ -100,7 +99,7 @@ describe('Core Unit Tests', function () {
           config : { prefix : prefix },
           result : function testHook (proxyObj) {
             // make sure the result is the default path without the prefix
-            var path = proxyObj.reqOpts.url.toUrl().pathname;
+            let path = proxyObj.reqOpts.url.toUrl().pathname;
             expect(path).to.equal(defaultPath);
             return done();
           }
@@ -108,12 +107,11 @@ describe('Core Unit Tests', function () {
       });
     });
 
-
     // Restrict
     //
     describe('.restrict', function () {
       function testRestrict (settings, callback) {
-        var handledByProxy = false;
+        let handledByProxy = false;
         testProxyConfig({
           request : {
             path : settings.path
@@ -124,7 +122,7 @@ describe('Core Unit Tests', function () {
             pre      : function (proxyObj, callback) {
               handledByProxy = true;
               return callback();
-            },
+            }
           }
         }, function () {
           return callback(handledByProxy);
@@ -217,12 +215,9 @@ describe('Core Unit Tests', function () {
       });
     });
 
-
     // request
     //
     describe('.request', function () {
-
-
       // Force Https
       //
       describe('.forceHttps', function () {
@@ -242,12 +237,11 @@ describe('Core Unit Tests', function () {
         });
       });
 
-
       // Prepend Request
       //
       describe('.prepend', function () {
         it('should prepend `/foo/bar/test` to the request', function (done) {
-          var prepend = 'foo/bar/test';
+          let prepend = 'foo/bar/test';
           testProxyConfig({
             request : {
               path: '/biz'
@@ -264,7 +258,6 @@ describe('Core Unit Tests', function () {
           });
         });
       });
-
 
       // Follow Redirects
       //
@@ -293,12 +286,11 @@ describe('Core Unit Tests', function () {
         });
       });
 
-
       // Request Headers
       //
       describe('.headers', function () {
-        var overrideUa     = 'test';
-        var requestHeaders = {
+        let overrideUa     = 'test';
+        let requestHeaders = {
           'User-Agent'      : ua,
           'accept-language' : language
         };
@@ -346,8 +338,8 @@ describe('Core Unit Tests', function () {
       // Request Query
       //
       describe('.query', function () {
-        var overrideQuery = { test: 'foo' };
-        var requestQuery  = {
+        let overrideQuery = { test: 'foo' };
+        let requestQuery  = {
           test : 'bar',
           biz  : 'baz'
         };
@@ -387,12 +379,11 @@ describe('Core Unit Tests', function () {
         });
       });
 
-
       // Request Form
       //
       describe('.form', function () {
-        var overrideForm = { test: 'foo' };
-        var requestForm  = {
+        let overrideForm = { test: 'foo' };
+        let requestForm  = {
           test : 'bar',
           biz  : 'baz'
         };
@@ -435,12 +426,11 @@ describe('Core Unit Tests', function () {
       });
     });
 
-
     // Pre
     //
     describe('.pre', function () {
       it('should accept a single functions', function (done) {
-        var funcCount = 0;
+        let funcCount = 0;
         testProxyConfig({
           config : {
             pre : function (proxyObj, callback) {
@@ -456,7 +446,7 @@ describe('Core Unit Tests', function () {
       });
 
       it('should accept an array of functions', function (done) {
-        var funcCount = 0;
+        let funcCount = 0;
         function funcStepper (proxyObj, callback) {
           funcCount++;
           return callback();
@@ -478,7 +468,6 @@ describe('Core Unit Tests', function () {
       });
     });
 
-
     // Post
     //
     describe('.post', function () {
@@ -495,7 +484,7 @@ describe('Core Unit Tests', function () {
       });
 
       it('should accept an array of functions', function (done) {
-        var funcCount = 0;
+        let funcCount = 0;
         function funcStepper (proxyObj, callback) {
           funcCount++;
           return callback();
