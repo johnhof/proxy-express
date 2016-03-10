@@ -1,8 +1,10 @@
-var superTest  = require('supertest');
-var express    = require('express');
-var proxy      = require('../lib/proxy');
-var mocha      = require('mocha');
-var expect     = require('chai').expect;
+'use strict';
+
+const superTest  = require('supertest');
+const express    = require('express');
+const proxy      = require('../lib/proxy');
+const mocha      = require('mocha');
+const expect     = require('chai').expect;
 
 ////////////////////////////////////////////////////////////
 //
@@ -10,11 +12,10 @@ var expect     = require('chai').expect;
 //
 ////////////////////////////////////////////////////////////
 
-
 describe('Core Integration Tests', function () {
   describe('Smoke test', function () {
     it('should make a basic request to github', function (done) {
-      var server = express();
+      let server = express();
 
       server.use(proxy('api.github.com', {
         prefix  : 'github',
@@ -29,6 +30,6 @@ describe('Core Integration Tests', function () {
       }));
 
       superTest(server).get('/github').expect(200).end(done);
-    })
+    });
   });
 });

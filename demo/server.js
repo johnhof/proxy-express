@@ -1,12 +1,13 @@
-var server = require('express')();
-var proxy  = require('../lib/proxy');
-var bodyParser = require('body-parser');
+'use strict';
 
+const server = require('express')();
+const proxy  = require('../lib/proxy');
+const bodyParser = require('body-parser');
 
-server.use( bodyParser.json());       // to support JSON-encoded bodies
+server.use(bodyParser.json());       // to support JSON-encoded bodies
 server.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
-})); 
+}));
 
 // travis proxy
 server.use(proxy('api.travis-ci.org', {
@@ -43,7 +44,7 @@ server.use(proxy('i.imgur.com', {
 // simple server health check
 server.get('/status', function (req, res) {
   res.send('OK');
-})
+});
 
 // return the app for all other routes
 server.get('*', function (req, res) {
