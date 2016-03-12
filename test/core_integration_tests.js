@@ -26,10 +26,26 @@ describe('Core Integration Tests', function () {
             'User-Agent' : 'Mozilla/5.0 (X11; Linux i686 (x86_64)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36',
             Authorization : require('./github_auth_header')
           }
+        },
+        log: true
+      }, true));
+
+      superTest(server).get('/github').expect(200).end(done);
+    });
+    it('should make a basic image request to imgur', function (done) {
+      let server = express();
+
+      server.use(proxy('i.imgur.com', {
+        prefix  : '/imgur',
+        log  : true,
+        request : {
+          headers    : {
+            'User-Agent' : 'Mozilla/5.0 (X11; Linux i686 (x86_64)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36',
+          }
         }
       }));
 
-      superTest(server).get('/github').expect(200).end(done);
+      superTest(server).get('/imgur/4GzUiKg.jpg').expect(200).end(done);
     });
   });
 });
