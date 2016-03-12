@@ -1,7 +1,6 @@
 'use strict';
 
 const superTest  = require('supertest');
-const request    = require('request');
 const express    = require('express');
 const bodyParser = require('body-parser');
 const proxy      = require('../lib/proxy');
@@ -12,7 +11,6 @@ const URL        = require('url');
 const QS         = require('qs');
 
 // test configurations
-const protocol    = 'https';
 const host        = 'api.github.com';
 const prefix      = '/github';
 const defaultPath = '/';
@@ -38,13 +36,14 @@ function testProxyConfig (options, finalCb) {
   // set up some defaults so we dont need to worry later
   options                     = options || {};
   options.request             = options.request || {};
-  options.request.headers     = _.defaults({},options.request.headers || {},{Authorization:require('./github_auth_header')}),
+  options.request.headers     = _.defaults({}, options.request.headers || {}, {Authorization: require('./github_auth_header')});
   options.request.query       = options.request.query || {};
   options.request.form        = options.request.form || {};
-  options.request.method      = (options.request.method || 'GET').toLowerCase()
+  options.request.method      = (options.request.method || 'GET').toLowerCase();
   options.config              = options.config || {};
   options.config.prefix       = options.config.prefix || '';
-  options.config.shortCircuit = true;
+  options.config.log          = options.config.log || false;
+  options.config.shortCircuit = options.config.shortCircuit === undefined ? true : options.config.shortCircuit;
 
   options.config.pre = options.config.pre || function (proxyObj, cb) {
     return options.result(proxyObj);
@@ -88,6 +87,22 @@ String.prototype.toUrl = function () {
 // Unit tests
 //
 ////////////////////////////////////////////////////////////
+
+describe('Configuration Error Cases', function () {
+  it('should Throw exception for non string host', function () {
+    expect(() => proxy()).to.throw(Error);
+    expect(() => proxy({})).to.throw(Error);
+    expect(() => proxy([])).to.throw(Error);
+    expect(() => proxy(null)).to.throw('proxy-express expects `host` to be a string');
+  });
+});
+
+describe('Optional Proxy Configs', function () {
+  it('should Throw exception for non string host', function () {
+    expect(() => proxy('/test', 'test')).to.not.throw(Error);
+    expect(() => proxy('/test', true)).to.not.throw(Error);
+  });
+});
 
 describe('Core Unit Tests', function () {
   describe('Config Options', function () {
