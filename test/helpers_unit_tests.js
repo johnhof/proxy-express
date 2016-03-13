@@ -19,7 +19,8 @@ describe('Helpers Unit Tests', function () {
     let success = 'OK';
     let result  = helpers.defaultHeaders({
       foo : success,
-      bar : undefined
+      bar : undefined,
+      bad : null
     }, {
       foo : 'Should be overridden',
       baz : success,
@@ -27,15 +28,19 @@ describe('Helpers Unit Tests', function () {
     });
 
     it('should override existing headers', function () {
-      expect(result.foo).to.equal(success)
+      expect(result.foo).to.equal(success);
     });
 
     it('should preserve headers not explicitly overridden', function () {
-      expect(result.baz).to.equal(success)
+      expect(result.baz).to.equal(success);
+    });
+
+    it('should should delete headers overridden with non string headers', function () {
+      expect(result).to.not.have.property('bad');
     });
 
     it('should should delete headers overridden with undefined', function () {
-      expect(result).to.not.have.property('bar')
+      expect(result).to.not.have.property('bar');
     });
   });
 
@@ -59,6 +64,10 @@ describe('Helpers Unit Tests', function () {
 
     it('should return false for path containing string', function () {
       expect(helpers.matchesRestriction({url: '/bar/biz'}, string)).to.equal(false);
+    });
+
+    it('should return null for invalid filter', function () {
+      expect(helpers.matchesRestriction({url: '/bar/biz'}, null)).to.equal(null);
     });
 
     describe('with a filter function', function () {
@@ -122,6 +131,17 @@ describe('Helpers Unit Tests', function () {
             () => _.constant(true)
           ])).to.equal(true);
         });
+      });
+    });
+
+    describe('Testing Option building', function () {
+      it('Should create proper objects', function () {
+        let stringOption = helpers.buildOptions('test');
+        expect(stringOption.prefix).to.equal('test');
+        let regExOption = helpers.buildOptions(new RegExp('test'));
+        expect(regExOption.restrict.match.test('test')).to.equal(true);
+        let objectOption = helpers.buildOptions({test: 'test'});
+        expect(objectOption.test).to.equal('test');
       });
     });
   });
