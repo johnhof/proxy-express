@@ -77,12 +77,27 @@ Forward all requests to the host specified. Only requests made with the prefix i
   // [METHOD] /foo/users => proxied to [METHOD] //www.foo.com/users
 ```
 
+## Proxy To Virtual host Website 
+
+Virtual host refers to HTTP header `host`. If proxy target is a virtual host website, set the header `host`'s value to  the website domain name
+
+```javascript
+  server.use(proxy('www.foo.com', {
+    request : {
+      headers  : {
+        'host' : 'www.foo.com',
+      }
+    }
+  }));
+```
+
+
 ## Proxy With Configuration
 
 Allows complex configuration. More details in the [configuration section](#configuration-options)
 
 ```javascript
-  server.use(proxy('ww.foo.com', {
+  server.use(proxy('www.foo.com', {
     prefix  : 'foo',
     request : {
       forceHttps : true,
