@@ -24,6 +24,7 @@ describe('Core Integration Tests', function () {
           strictSSL  : false,
           headers    : {
             'User-Agent' : 'Mozilla/5.0 (X11; Linux i686 (x86_64)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36',
+            'host' : 'api.github.com',
             Authorization : require('./github_auth_header')
           }
         },
@@ -41,6 +42,7 @@ describe('Core Integration Tests', function () {
         request : {
           headers    : {
             'User-Agent' : 'Mozilla/5.0 (X11; Linux i686 (x86_64)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36',
+            'host' : 'i.imgur.com',
           }
         }
       }));
