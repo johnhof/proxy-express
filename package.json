@@ -1,9 +1,9 @@
 {
-  "name": "proxy-express",
-  "author": "John Hofrichter <https://github.com/johnhof>",
+  "name": "@fallen90/proxy-express",
+  "author": "fallen90 <https://github.com/fallen90>",
   "description": "Request proxying middleware for express",
   "version": "2.0.0",
-  "repository": "git://github.com/johnhof/proxy-express",
+  "repository": "git://github.com/fallen90/proxy-express",
   "main": "lib/proxy.js",
   "keywords": [
     "proxy",
@@ -17,7 +17,8 @@
   },
   "dependencies": {
     "async": "^0.9.x",
-    "cloudscraper": "^1.4.1",
+    "brotli": "^1.3.2",
+    "cloudscraper": "^4.6.0",
     "colors": "~1.0.3",
     "lodash": "2.4.x",
     "request": "^2.53.x"
@@ -29,18 +30,18 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/johnhof/proxy-express/blob/master/LICENSE-MIT"
+      "url": "https://github.com/fallen90/proxy-express/blob/master/LICENSE-MIT"
     }
   ],
   "devDependencies": {
-    "body-parser": "^1.12.0",
+    "body-parser": "^1.19.0",
     "chai": "1.10.x",
-    "express": "^4.12.x",
+    "express": "^4.17.1",
     "istanbul": "^0.4.2",
     "mocha": "2.4.x",
-    "qs": "^2.3.3",
+    "qs": "^6.9.3",
     "should": "1.1.x",
     "supertest": "^0.15.0",
-    "url": "^0.10.3"
+    "url": "^0.11.0"
   }
 }
